@@ -33,7 +33,7 @@ typedef struct      s_list
 }                   t_list;
 
 float get_timee(char *buf);
-static t_list *get_new(void);
+t_list *get_new(void);
 float process_list(t_list **lst, t_list **first, float t);
 
 @end
