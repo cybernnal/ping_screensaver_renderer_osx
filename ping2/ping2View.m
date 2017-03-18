@@ -88,20 +88,25 @@ static NSString * const MyModuleName = @"com.tom.ping";
     [color set];
     [path fill];}
 
-- (void)    rend:(t_list*) lst first:(t_list*) first max:(float) max
+- (void)    rend:(t_list*) lst first:(t_list*) first max:(float) max med:(float) med
 {
     NSRect e = [[NSScreen mainScreen] frame];
-    int H = (int)e.size.height - 10;
+    int H = (int)e.size.height - 30;
     int W = (int)e.size.width;
     float off =  (W - 50) / MAXX;
     int i = 0;
     lst = first;
     while (lst){
         if (lst->t == 0)
-            [self draw_square:off y_max:off origin_x:(int)(((i * (off))) + 10) origin_y:(int) L_CF(lst->t, 0, max, 10, H - off * 2) r:255 g:0 b:0];
+            [self draw_square:off y_max:off origin_x:(int)(((i * (off))) + 10) origin_y:(int) L_CF(0, 0, max, 10, H - off * 2) r:255 g:0 b:0];
         else
             [self draw_square:off y_max:off origin_x:(int)(((i * (off))) + 10) origin_y:(int) L_CF(lst->t, 0, max, 10, H - off * 2) r:L_CF(lst->t, 0, max, 0, 1) g:L_CF(lst->t, 0, max, 1, 0) b:L_CF(lst->t, 0, max, 0.7, 1)];
-        
+        if (i % 10 == 0)
+        {
+            [self draw_square:off / 2 y_max:off / 2 origin_x:(int)(((i * (off))) + 10) origin_y:L_CF(0, 0, max, 10, H - off * 2) r:0 g:255 b:0];
+            [self draw_square:off / 2 y_max:off / 2 origin_x:(int)(((i * (off))) + 10) origin_y:(int) L_CF(10, 0, max, 10, H - off * 2) r:0 g:255 b:0];
+            [self draw_square:off / 2 y_max:off / 2 origin_x:(int)(((i * (off))) + 10) origin_y:(int) L_CF(med, 0, max, 10, H - off * 2) r:0 g:0 b:255];
+        }
         lst = lst->next;
         i++;
     }
@@ -110,7 +115,7 @@ static NSString * const MyModuleName = @"com.tom.ping";
 
 - (void)animateOneFrame
 {
-    int error = 300;
+    int error = 1000;
     static t_list  *lst;
     static t_list  *first;
     NSSize size;
@@ -121,11 +126,13 @@ static NSString * const MyModuleName = @"com.tom.ping";
     int max = 0;
     char *cmd = "ping -i 0.1 -c 1 -t 1 8.8.8.8";
     float ms;
+    float med = 0;
+    static int mod = 0;
     NSAttributedString * currentText;
-    
+    static float tmp;
     [self draw_black];
     if ((fp = popen(cmd, "r")) == NULL) {
-        max = process_list(&lst, &first, error);
+        max = process_list(&lst, &first, error, &med);
     }
     else
     {
@@ -136,26 +143,32 @@ static NSString * const MyModuleName = @"com.tom.ping";
                 if (i != 0)
                 {
                     ms = get_timee(buf);
+                    if (mod % 15 == 0)
+                    {
+                        tmp = ms;
+                        mod = 0;
+                    }
+                    mod++;
                     NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:[NSFont fontWithName:@"Helvetica" size:15], NSFontAttributeName,[NSColor blueColor], NSForegroundColorAttributeName, nil];
-                    if (ms == 0.0)
+                    if (tmp == 0.0)
                         currentText=[[NSAttributedString alloc] initWithString:@"time out" attributes: attributes];
                     else
-                        currentText=[[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@ ms", [NSNumber numberWithFloat:ms].stringValue] attributes: attributes];
+                        currentText=[[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@ ms", [NSNumber numberWithFloat:tmp].stringValue] attributes: attributes];
                     [currentText drawAtPoint:NSMakePoint(0, 0)];
-                    max = process_list(&lst, &first, ms);
+                    max = process_list(&lst, &first, ms, &med);
                     break ;
                 }
                 i++;
             }
             else
             {
-                max = process_list(&lst, &first, error);
+                max = process_list(&lst, &first, error, &med);
                 break ;
             }
         }
         pclose(fp);
     }
-    [self rend:lst first:first max:max];
+    [self rend:lst first:first max:max med:med];
     size = [self bounds].size;
     defaults = [ScreenSaverDefaults defaultsForModuleWithName:MyModuleName];
 }
@@ -167,7 +180,16 @@ static NSString * const MyModuleName = @"com.tom.ping";
 
 - (NSWindow*)configureSheet
 {
-    return Nil;
+    if (!configSheet)
+    {
+        if (![NSBundle loadNibNamed:@"ConfigureSheet" owner:self])
+        {
+            NSLog( @"Failed to load configure sheet." );
+            NSBeep();
+        }
+    }
+    
+    return configSheet;
 }
 
 - (IBAction)cancelClick:(id)sender
@@ -253,11 +275,14 @@ float get_max(t_list **l)
 }
 
 
-float process_list(t_list **lst, t_list **first, float t)
+float process_list(t_list **lst, t_list **first, float t, float *med)
 {
     static int nb = 0;
     static float max = 0;
+    static float total = 0;
     
+    if (t == 0)
+        t = 1000;
     if (nb == 0)
     {
         *lst = get_new();
@@ -273,12 +298,15 @@ float process_list(t_list **lst, t_list **first, float t)
         *first = (*first)->next;
         *lst = (*lst)->next;
         (*lst)->next = NULL;
-        if ((*lst)->t == max)
+        if ((*lst)->t == max && t != max)
             max = get_max(first);
+        total -= (*lst)->t;
+        nb--;
     }
     (*lst)->t = t;
-    if (t > max)
-        max = t;
+    total += (*lst)->t;
+    if (t > max)        max = t;
     nb++;
+    *med = total / MAXX;
     return (max);
 }

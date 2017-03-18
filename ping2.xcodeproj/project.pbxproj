@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		476E37BD1E7B002E0058520A /* ping2View.h in Headers */ = {isa = PBXBuildFile; fileRef = 476E37BC1E7B002E0058520A /* ping2View.h */; };
 		476E37BF1E7B002E0058520A /* ping2View.m in Sources */ = {isa = PBXBuildFile; fileRef = 476E37BE1E7B002E0058520A /* ping2View.m */; };
+		47EFF9851E7C19390038B1AE /* ConfigureSheet.nib in Resources */ = {isa = PBXBuildFile; fileRef = 47EFF9841E7C19390038B1AE /* ConfigureSheet.nib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -16,6 +17,7 @@
 		476E37BC1E7B002E0058520A /* ping2View.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ping2View.h; sourceTree = "<group>"; };
 		476E37BE1E7B002E0058520A /* ping2View.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ping2View.m; sourceTree = "<group>"; };
 		476E37C01E7B002E0058520A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		47EFF9841E7C19390038B1AE /* ConfigureSheet.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ConfigureSheet.nib; path = ../../../Downloads/ConfigureSheet.nib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -48,6 +50,7 @@
 		476E37BB1E7B002E0058520A /* ping2 */ = {
 			isa = PBXGroup;
 			children = (
+				47EFF9841E7C19390038B1AE /* ConfigureSheet.nib */,
 				476E37BC1E7B002E0058520A /* ping2View.h */,
 				476E37BE1E7B002E0058520A /* ping2View.m */,
 				476E37C01E7B002E0058520A /* Info.plist */,
@@ -124,6 +127,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				47EFF9851E7C19390038B1AE /* ConfigureSheet.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -271,6 +275,7 @@
 				476E37C51E7B002E0058520A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

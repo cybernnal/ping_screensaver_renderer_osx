@@ -8,7 +8,7 @@
 
 #import <ScreenSaver/ScreenSaver.h>
 #define BUFSIZE 128
-#define MAXX 200
+#define MAXX 300
 #define L_CF(X, x1, x2, y1, y2) ((float)(((float)((X - x1) * (y2 - y1))) / (float)(x2 - x1)) + y1)
 
 @interface pingView : ScreenSaverView
@@ -33,7 +33,7 @@ typedef struct      s_list
 }                   t_list;
 
 float get_timee(char *buf);
-static t_list *get_new(void);
-float process_list(t_list **lst, t_list **first, float t);
+t_list *get_new(void);
+float process_list(t_list **lst, t_list **first, float t, float *med);
 
 @end
